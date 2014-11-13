@@ -57,12 +57,17 @@ abstract class BaseAmqp
 
     public function __destruct()
     {
-        if ($this->ch) {
-            $this->ch->close();
-        }
-        
-        if ($this->conn->isConnected()) {
-            $this->conn->close();
+        try {
+            if ($this->ch) {
+                $this->ch->close();
+            }
+
+            if ($this->conn->isConnected()) {
+                $this->conn->close();
+            }
+        } catch (\Exception $e) {
+            // Just eat 'em all
+            syslog(LOG_ERR, sprintf('AMQP::__destruct: %s', $e->getMessage()));
         }
     }
 
